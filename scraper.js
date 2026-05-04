@@ -495,6 +495,29 @@ $(function() {
         }
     });
 });
+// ─── Ajuste automático de Zona Horaria ───
+// Convierte la hora base (UTC+1) a la hora local del usuario
+$(function() {
+    var offsetMin = (new Date().getTimezoneOffset() * -1) - 60; 
+    if (offsetMin !== 0) {
+        $('span.t').each(function() {
+            var text = $(this).text().trim();
+            if (text) {
+                var parts = text.split(':');
+                if (parts.length === 2) {
+                    var d = new Date();
+                    d.setHours(parseInt(parts[0], 10));
+                    d.setMinutes(parseInt(parts[1], 10) + offsetMin);
+                    
+                    var h = d.getHours().toString().padStart(2, '0');
+                    var m = d.getMinutes().toString().padStart(2, '0');
+                    $(this).text(h + ':' + m);
+                }
+            }
+        });
+    }
+});
+
 </script>
 
 </body>
