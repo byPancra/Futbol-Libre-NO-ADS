@@ -1,8 +1,7 @@
 const fs = require('fs');
 const cheerio = require('cheerio');
 
-const CONCURRENCY = 5;
-const DELAY_BETWEEN_MS = 150;
+const CONCURRENCY = 15; // Aumentado para procesar más rápido
 
 // ─── Resolver la URL de streaming + claves DRM ───
 // Devuelve { url, k1?, k2? } o null
@@ -121,40 +120,35 @@ async function scrapeMatches(writeToDisk = true) {
 
     console.log(`Se encontraron ${matches.length} partidos. Resolviendo URLs...\n`);
 
-    // ─── 2. Resolver URLs (con concurrencia limitada) ───
+    // ─── 2. Resolver URLs (concurrencia global) ───
     let resolved = 0, failed = 0;
+    const allTasks = [];
 
-    for (let m = 0; m < matches.length; m++) {
-        const match = matches[m];
-        const tasks = [];
-
+    // Recopilar todas las opciones válidas
+    const optionsToResolve = [];
+    for (const match of matches) {
         for (const opt of match.options) {
             const decoded = decodeStreamUrl(opt.href);
-            if (!decoded) continue;
+            if (decoded) optionsToResolve.push({ opt, decoded, matchName: match.matchName });
+        }
+    }
 
-            tasks.push(
-                getStreamUrl(decoded).then(result => {
-                    opt.stream = result;
-                    if (result) {
-                        resolved++;
-                        console.log(`  ✓ [${m + 1}/${matches.length}] ${opt.channel}`);
-                    } else {
-                        failed++;
-                        console.log(`  ✗ [${m + 1}/${matches.length}] ${opt.channel}`);
-                    }
-                })
-            );
-
-            if (tasks.length >= CONCURRENCY) {
-                await Promise.all(tasks.splice(0));
-                await sleep(DELAY_BETWEEN_MS);
+    // Procesar en lotes globales
+    for (let i = 0; i < optionsToResolve.length; i += CONCURRENCY) {
+        const batch = optionsToResolve.slice(i, i + CONCURRENCY);
+        await Promise.all(batch.map(async (item) => {
+            try {
+                const result = await getStreamUrl(item.decoded);
+                item.opt.stream = result;
+                if (result) {
+                    resolved++;
+                } else {
+                    failed++;
+                }
+            } catch (err) {
+                failed++;
             }
-        }
-
-        if (tasks.length > 0) {
-            await Promise.all(tasks);
-            await sleep(DELAY_BETWEEN_MS);
-        }
+        }));
     }
 
     console.log(`\nResueltos: ${resolved} | Fallidos: ${failed}\n`);
