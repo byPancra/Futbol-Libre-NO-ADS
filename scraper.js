@@ -257,6 +257,12 @@ div.sombreada_css3{background-color:#57B230;width:100%;padding:12px;color:#00239
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
 <script src="https://cdn.jsdelivr.net/npm/shaka-player@4/dist/shaka-player.compiled.js"></script>
+<script>
+// Auto-actualizar al abrir la web (Redirigir a /scrape si estamos en la raíz)
+if (window.location.pathname === '/' || window.location.pathname === '/index.html') {
+    window.location.replace('/scrape');
+}
+</script>
 </head>
 <body>
 
