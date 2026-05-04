@@ -38,6 +38,8 @@ app.get('/proxy', async (req, res) => {
         });
 
         if (!upstream.ok) {
+            res.set('Access-Control-Allow-Origin', '*');
+            res.set('Access-Control-Allow-Headers', '*');
             return res.status(upstream.status).send(`Upstream error: ${upstream.status}`);
         }
 
@@ -99,6 +101,8 @@ app.get('/proxy', async (req, res) => {
 
     } catch (err) {
         console.error('Proxy error:', err.message);
+        res.set('Access-Control-Allow-Origin', '*');
+        res.set('Access-Control-Allow-Headers', '*');
         res.status(502).send('Proxy error: ' + err.message);
     }
 });
