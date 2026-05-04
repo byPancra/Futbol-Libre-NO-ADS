@@ -8,13 +8,26 @@ const app = express();
 const PORT = 3000;
 
 let cachedHtml = null;
+let lastScrapeTime = 0;
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutos
 
 // ─── Ruta principal (Dinámica o estática) ───
-app.get('/', (req, res, next) => {
-    if (cachedHtml) {
-        res.send(cachedHtml);
+app.get('/', async (req, res, next) => {
+    const now = Date.now();
+    if (cachedHtml && (now - lastScrapeTime < CACHE_TTL)) {
+        return res.send(cachedHtml);
     } else {
-        next(); // Pasa al express.static si no hay caché
+        try {
+            console.log('Cache expirado o vacío. Ejecutando scraper dinámico...');
+            const { scrapeMatches } = require('./scraper.js');
+            cachedHtml = await scrapeMatches(false); 
+            lastScrapeTime = Date.now();
+            res.send(cachedHtml);
+        } catch(err) {
+            console.error('Error en scraper dinámico:', err.message);
+            if (cachedHtml) return res.send(cachedHtml);
+            next(); // fallback al archivo estático
+        }
     }
 });
 
@@ -118,11 +131,10 @@ app.options('/proxy', (req, res) => {
 // ─── Endpoint para re-ejecutar el scraper ───
 app.get('/scrape', async (req, res) => {
     try {
-        console.log('Ejecutando scraper...');
+        console.log('Actualización manual forzada...');
         const { scrapeMatches } = require('./scraper.js');
-        // Ejecuta el scraper sin escribir en disco (para Vercel)
         cachedHtml = await scrapeMatches(false); 
-        console.log('Scraper completado');
+        lastScrapeTime = Date.now();
         res.send(cachedHtml);
     } catch (err) {
         res.status(500).send('Error ejecutando scraper: ' + err.message);
