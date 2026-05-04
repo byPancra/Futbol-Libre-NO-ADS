@@ -1,0 +1,14 @@
+{
+  "name": "futbol-scraper",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Scraper de agenda deportiva de pelotalibretv.su",
+  "scripts": {
+    "start": "node server.js",
+    "scrape": "node scraper.js"
+  },
+  "dependencies": {
+    "cheerio": "^1.2.0",
+    "express": "^5.2.1"
+  }
+}

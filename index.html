@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agenda - Lunes 04 de Mayo de 2026</title>
+<style>
+body{font-size:100%;background:#fff;margin:0}
+@media only screen and (max-width:600px){body{font-size:70%}}
+a{text-decoration:none}
+ul,ul ul{margin:0;padding:0;list-style:none}
+#wraper{width:100%;margin:0 auto;font-size:.8125em}
+.menu{width:auto;height:auto;box-shadow:0 1px 3px 0 rgba(0,0,0,.73),0 0 18px 0 rgba(0,0,0,.1)}
+.menu>li>a{background:#fff;border-bottom:0 solid #33373d;box-shadow:inset 0 1px 0 0 #878e98;width:100%;height:2.8em;line-height:2.8em;text-indent:7.9em;display:block;position:relative;font-family:Arial,Helvetica,sans-serif;font-weight:600;color:#404040;font-size:1em}
+.menu ul li a{background:#fff;border-bottom:1px solid #efeff0;width:100%;height:2.8em;line-height:2.8em;text-indent:3.75em;display:block;position:relative;font-family:Arial,Helvetica,sans-serif;font-size:1em;font-weight:500;color:#789;cursor:pointer}
+.menu ul li:last-child a{border-bottom:1px solid #33373d}
+.menu>li>a:hover,.menu>li>a.active{background:rgb(148,204,124);border-bottom:1px solid #404040;box-shadow:inset 0 1px 0 0 #404040}
+.menu>li>a.active{border-bottom:0 solid #404040}
+.menu>li>a:before{content:'';background-image:url(https://pelotalibretv.su/agenda/spriteupdate8.png);background-repeat:no-repeat;font-size:36px;height:1em;width:1em;position:absolute;left:55px;top:50%;margin:-.5em 0 0}
+@media only screen and (max-width:600px){.menu>li>a:before{left:30px}}
+.LC>a:before{background-position:-75px -720px}.VEN>a:before{background-position:-38px -725px}.COL>a:before{background-position:0 0}.MEX>a:before{background-position:-38px 0}.ES>a:before{background-position:0 -38px}.PE>a:before{background-position:-38px -38px}.CAT>a:before{background-position:0 -685px}.ENG>a:before{background-position:-76px 0}.FRA>a:before{background-position:-76px -38px}.USA>a:before{background-position:0 -76px}.JA>a:before{background-position:-38px -76px}.IT>a:before{background-position:0 -114px}.BRA>a:before{background-position:-38px -114px}.ALE>a:before{background-position:-76px -76px}.POR>a:before{background-position:-76px -114px}.CH>a:before{background-position:0 -152px}.ECUA>a:before{background-position:-38px -152px}.URU>a:before{background-position:0 -190px}.EURO>a:before{background-position:-38px -190px}.AR>a:before{background-position:-76px -152px}.AMERICA>a:before{background-position:-76px -190px}.ARA>a:before{background-position:-37px -687px}.PAR>a:before{background-position:0 -608px}.BOL>a:before{background-position:-76px -608px}.PARA>a:before{background-position:0 -646px}.HOL>a:before{background-position:-38px -608px}
+.menu>li>a span{font-size:.95em;display:inline-block;position:absolute;left:.3em;top:50%;background:#fff;line-height:1em;height:1em;padding:.3em .6em;margin:-.8em 0 0;color:#222d36;text-indent:0;text-align:center;border-radius:.569em;box-shadow:inset 0 1px 3px 0 rgba(0,0,0,.16),0 1px 0 0 rgba(63,68,74,.1);font-weight:500}
+.menu>li>a:hover span,.menu>li a.active span{background:#404040;color:#fff}
+.menu>li>ul li a:before{content:'►';font-size:9px;color:#789;position:absolute;width:1em;height:1em;top:0;left:-2.7em}
+.menu>li>ul li:hover a,.menu>li>ul li:hover a span,.menu>li>ul li:hover a:before{color:#2e9afe}
+.menu ul>li>a span{font-size:.857em;display:inline-block;position:absolute;right:1em;top:50%;border:1px solid #d0d0d3;line-height:1em;height:1em;padding:.4em .7em;margin:-.9em 0 0;color:#000;text-indent:0;text-align:center;border-radius:.769em}
+div.sombreada_css3{background-color:#57B230;width:100%;padding:12px;color:#002399;box-shadow:0 1px 1px #333;text-align:center;box-sizing:border-box}
+
+/* ─── Player Overlay ─── */
+#player-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.92);z-index:9999;justify-content:center;align-items:center;flex-direction:column}
+#player-overlay.active{display:flex}
+#player-overlay video{width:90%;max-width:1200px;max-height:80vh;background:#000;border-radius:8px}
+#player-close{position:fixed;top:15px;right:25px;font-size:36px;color:#fff;cursor:pointer;z-index:10000;font-family:Arial;line-height:1}
+#player-close:hover{color:#ff4444}
+#player-status{color:#aaa;font-family:Arial;font-size:14px;margin-top:10px}
+#btn-refresh{display:inline-block;background:#2e9afe;color:#fff;border:none;padding:6px 18px;border-radius:4px;cursor:pointer;font-size:12px;font-family:Arial;margin-left:12px;vertical-align:middle}
+#btn-refresh:hover{background:#0d7edb}
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
+<script src="https://cdn.jsdelivr.net/npm/shaka-player@4/dist/shaka-player.compiled.js"></script>
+</head>
+<body>
+
+<!-- Player Overlay -->
+<div id="player-overlay">
+    <span id="player-close" onclick="closePlayer()">&times;</span>
+    <video id="player-video" controls autoplay playsinline webkit-playsinline></video>
+    <div id="player-status"></div>
+</div>
+
+<div id="wraper">
+<ul class="menu">
+<center>
+<div class="sombreada_css3">
+<font size="2" face="Helvetica Neue,Helvetica,Arial,sans-serif" color="#FFFFFF">
+<b>Agenda - Lunes 04 de Mayo de 2026</b>
+<a id="btn-refresh" href="/scrape">🔄 Actualizar</a>
+</font>
+</div>
+</center>
+
+
+<li class="PE"><a href="#">
+Liga 1: Los Chankas vs Deportivo Garcilaso<span class="t">19:00</span></a>
+<ul>
+<li class="subitem1"><a href="#" onclick="playStream(0);return false;">Fanatiz<span>Calidad 720p</span></a></li>
+<li class="subitem1"><a href="#" onclick="playStream(1);return false;">Liga 1 MAX<span>Calidad 720p</span></a></li>
+</ul>
+</li>
+
+<li class="IT"><a href="#">
+Serie A: Roma vs Fiorentina<span class="t">19:45</span></a>
+<ul>
+<li class="subitem1"><a href="#" onclick="playStream(2);return false;">Eventos<span>Calidad 1080p</span></a></li>
+<li class="subitem1"><a href="#" onclick="playStream(3);return false;">ESPN 3<span>Calidad 720p</span></a></li>
+<li class="subitem1"><a href="#" onclick="playStream(4);return false;">Disney+<span>Calidad 720p</span></a></li>
+<li class="subitem1"><a href="#" onclick="playStream(5);return false;">FOX Deportes<span>Calidad 720p</span></a></li>
+<li class="subitem1"><a href="#" onclick="playStream(6);return false;">ESPN 2 MX<span>Calidad 720p</span></a></li>
+</ul>
+</li>
+
+<li class="ENG"><a href="#">
+Premier League: Everton vs Manchester City<span class="t">20:00</span></a>
+<ul>
+<li class="subitem1"><a href="#" onclick="playStream(7);return false;">ESPN<span>Calidad 720p</span></a></li>
+<li class="subitem1"><a href="#" onclick="playStream(8);return false;">Disney+<span>Calidad 720p</span></a></li>
+<li class="subitem1"><a href="#" onclick="playStream(9);return false;">Universo<span>Calidad 1080p</span></a></li>
+<li class="subitem1"><a href="#" onclick="playStream(10);return false;">Universo | OP 2<span>Calidad 720p</span></a></li>
+<li class="subitem1"><a href="#" onclick="playStream(11);return false;">MAX<span>Calidad 720p</span></a></li>
+</ul>
+</li>
+
+<li class="ES"><a href="#">
+LaLiga: Sevilla vs Real Sociedad<span class="t">20:00</span></a>
+<ul>
+<li class="subitem1"><a href="#" onclick="playStream(12);return false;">Eventos<span>Calidad 1080p</span></a></li>
+<li class="subitem1"><a href="#" onclick="playStream(13);return false;">ESPN 2<span>Calidad 720p</span></a></li>
+<li class="subitem1"><a href="#" onclick="playStream(14);return false;">Disney+<span>Calidad 720p</span></a></li>
+<li class="subitem1"><a href="#" onclick="playStream(15);return false;">ESPN Deportes<span>Calidad 720p</span></a></li>
+<li class="subitem1"><a href="#" onclick="playStream(16);return false;">LaLiga TV<span>Calidad 1080p</span></a></li>
+<li class="subitem1"><a href="#" onclick="playStream(17);return false;">ESPN+ | Español<span>Calidad 720p</span></a></li>
+<li class="subitem1"><a href="#" onclick="playStream(18);return false;">ESPN+ | English<span>Calidad 720p</span></a></li>
+</ul>
+</li>
+
+<li class="POR"><a href="#">
+Primeira Liga: Sporting CP vs Vitória Guimarães<span class="t">20:15</span></a>
+<ul>
+<li class="subitem1"><a href="#" onclick="playStream(19);return false;">Sportdigital | OP 2<span>Calidad 720p</span></a></li>
+</ul>
+</li>
+
+<li class="AR"><a href="#">
+Liga Profesional: Gimnasia Mendoza vs Defensa y Justicia<span class="t">21:00</span></a>
+<ul>
+<li class="subitem1"><a href="#" onclick="playStream(20);return false;">ESPN Premium<span>Calidad 720p</span></a></li>
+<li class="subitem1"><a href="#" onclick="playStream(21);return false;">Fanatiz | Español<span>Calidad 720p</span></a></li>
+</ul>
+</li>
+
+<li class="AR"><a href="#">
+Liga Profesional: Vélez Sarsfield vs Newell&#39;s Old Boys<span class="t">23:15</span></a>
+<ul>
+<li class="subitem1"><a href="#" onclick="playStream(22);return false;">Fanatiz | Español<span>Calidad 720p</span></a></li>
+<li class="subitem1"><a href="#" onclick="playStream(23);return false;">TNT Sports<span>Calidad 720p</span></a></li>
+</ul>
+</li>
+
+<li class="URU"><a href="#">
+Primera División: Peñarol vs Defensor Sporting<span class="t">23:30</span></a>
+<ul>
+<li class="subitem1"><a href="#" onclick="playStream(24);return false;">Disney+<span>Calidad 720p</span></a></li>
+</ul>
+</li>
+
+<li class="CH"><a href="#">
+Copa de la Liga: Deportes Concepción vs Huachipato<span class="t">01:30</span></a>
+<ul>
+<li class="subitem1"><a href="#" onclick="playStream(25);return false;">TNT Sports Chile<span>Calidad 720p</span></a></li>
+<li class="subitem1"><a href="#" onclick="playStream(26);return false;">MAX<span>Calidad 720p</span></a></li>
+</ul>
+</li>
+
+<li class="AR"><a href="#">
+Liga Profesional: Estudiantes Río Cuarto vs Instituto<span class="t">01:30</span></a>
+<ul>
+<li class="subitem1"><a href="#" onclick="playStream(27);return false;">Fanatiz | Español<span>Calidad 720p</span></a></li>
+<li class="subitem1"><a href="#" onclick="playStream(28);return false;">ESPN Premium<span>Calidad 720p</span></a></li>
+</ul>
+</li>
+
+
+</ul>
+</div>
+
+<script>
+// Datos de streams inyectados por el scraper
+var STREAMS = [{"url":"https://bd2ih.envivoslatam.org:443/hotflix/fanatiz1/index.m3u8?token=2dc9068ad8d68f094074b64fa7c4d06c6ec36d53-f8-1777969617-1777915617&ip=79.112.68.91","k1":null,"k2":null},{"url":"https://iaw5b.envivoslatam.org:443/hotflix/liga1max/index.m3u8?token=86fbf9028b353a88f1163548ce77c5b6b0252b42-fb-1777969617-1777915617&ip=79.112.68.91","k1":null,"k2":null},{"url":"https://live.streaming.a2d.tv/asset/20465730.isml/dash.mpd","k1":"729e43e22f86327ea9cbfd859b6e50e9","k2":"bbd3b6b123a10cb4cdfd79751f56b0af"},{"url":"https://bd2ih.envivoslatam.org:443/hotflix/espn3/index.m3u8?token=43d98847570d2097903d0b9b235473bd0765998c-bb-1777969617-1777915617&ip=79.112.68.91","k1":null,"k2":null},{"url":"https://afy4c.envivoslatam.org:443/hotflix/disney3/index.m3u8?token=ad49a69b1b7fb1e1c5f250ff7f1b2e015171c4c0-20-1777969617-1777915617&ip=79.112.68.91","k1":null,"k2":null},{"url":"https://vg7ie.envivoslatam.org:443/hotflix/fox_deportes_usa/index.m3u8?token=baaed973e33c48724aa6ffeedc29d30bf3b87508-e5-1777969617-1777915617&ip=79.112.68.91","k1":null,"k2":null},{"url":"https://bd2ih.envivoslatam.org:443/hotflix/espn2mx/index.m3u8?token=cfbcd3df2b8e37bdf0cb21b4f87e8f6577517749-5c-1777969617-1777915617&ip=79.112.68.91","k1":null,"k2":null},{"url":"https://plts1.envivoslatam.org:443/hotflix/espn/index.m3u8?token=321ad66cb0da0bea32c4a82cd5873edd933b2949-22-1777969617-1777915617&ip=79.112.68.91","k1":null,"k2":null},{"url":"https://plts3.envivoslatam.org:443/hotflix/disney4/index.m3u8?token=48f9776bf236dec10efcca7918247c10c7d0e7da-03-1777969617-1777915617&ip=79.112.68.91","k1":null,"k2":null},{"url":"https://live-oneapp-prd-news.akamaized.net/Content/CMAF_OL2-CTR-4s/Live/channel(universo-east)/master.mpd","k1":"96b67fa09140329a89b7a1ead134eda3","k2":"c618d32c56cdc6cad8330eb98507ca3f"},{"url":"https://plts1.envivoslatam.org:443/hotflix/universo_usa/index.m3u8?token=420e005c11a19aad24e446401976f38e54ae9626-a1-1777969617-1777915617&ip=79.112.68.91","k1":null,"k2":null},{"url":"https://plts4.envivoslatam.org:443/hotflix/max1/index.m3u8?token=b22702936683bae0cae9eba57ecbbd8e288ed8b2-8a-1777969618-1777915618&ip=79.112.68.91","k1":null,"k2":null},{"url":"https://live.streaming.a2d.tv/asset/20465731.isml/dash.mpd","k1":"4e30426a0a5c36359b1606dd7bc90937","k2":"508fb8a6038bf24a216c27e3efe3d9cf"},{"url":"https://lcrj3.envivoslatam.org:443/hotflix/espn2/index.m3u8?token=7a18e8deb4a9ec928b6085e71d43c2550195b9c8-63-1777969618-1777915618&ip=79.112.68.91","k1":null,"k2":null},{"url":"https://rci1w.envivoslatam.org:443/hotflix/disney5/index.m3u8?token=e3a33e5c6fc820da45cd6bdd18a6d388bb0afbb0-04-1777969618-1777915618&ip=79.112.68.91","k1":null,"k2":null},{"url":"https://qbk4f.envivoslatam.org:443/hotflix/espndeportes/index.m3u8?token=c30353e57f312f3eba7396ea14c03e064a937446-02-1777969618-1777915618&ip=79.112.68.91","k1":null,"k2":null},{"url":"https://otte.bia-cf.live.pv-cdn.net/pdx-nitro/live/clients/dash/enc/k0duzgfejg/out/v1/70a50b1bda944628b8e7e66ab4069419/cenc.mpd","k1":"620e51b82596475517a27aa425c52280","k2":"2b9ba811e9c5aeafc8ae1b71cdca4d6a"},{"url":"https://tk0hz.envivoslatam.org:443/hotflix/espnplus1/index.m3u8?token=507f0b1315ef2563216f07cc3cde3dea98fb7f15-cc-1777969618-1777915618&ip=79.112.68.91","k1":null,"k2":null},{"url":"https://tk0hz.envivoslatam.org:443/hotflix/espnplus2/index.m3u8?token=26b951db14b0d111fb8583591c7a9d7bd0466fa7-73-1777969618-1777915618&ip=79.112.68.91","k1":null,"k2":null},{"url":"https://chrz.envivoslatam.org:443/hotflix/eventos2/index.m3u8?token=3f3c4df9cce4490ac3d1fd8cf3fe21fd6822030a-0f-1777969618-1777915618&ip=79.112.68.91","k1":null,"k2":null},{"url":"https://smjt9q.envivoslatam.org:443/hotflix/espnpremium/index.m3u8?token=4a377f692a9e37e52a51423a55aa89e80cf784fe-d3-1777969619-1777915619&ip=79.112.68.91","k1":null,"k2":null},{"url":"https://vg7ie.envivoslatam.org:443/hotflix/fanatiz2/index.m3u8?token=23241113758408b92224d634dcfbcf15bedcfba0-42-1777969619-1777915619&ip=79.112.68.91","k1":null,"k2":null},{"url":"https://bd2ih.envivoslatam.org:443/hotflix/fanatiz3/index.m3u8?token=108f6f903c6fa7dad771d2d573047fe955e1d42b-93-1777969619-1777915619&ip=79.112.68.91","k1":null,"k2":null},{"url":"https://yce5o.envivoslatam.org:443/hotflix/tntsports/index.m3u8?token=b23d723337bbdc88040b2688d9df7dce35082b41-8b-1777969619-1777915619&ip=79.112.68.91","k1":null,"k2":null},{"url":"https://plts2.envivoslatam.org:443/hotflix/disney1/index.m3u8?token=fdb91dacb7fdc23e42f3ce9a559368bfd75ee0d4-16-1777969619-1777915619&ip=79.112.68.91","k1":null,"k2":null},{"url":"https://qbk4f.envivoslatam.org:443/hotflix/tntsportschile/index.m3u8?token=a302409448f6060410419e4699e54e2f60737d2f-06-1777969619-1777915619&ip=79.112.68.91","k1":null,"k2":null},{"url":"https://kh5vy.envivoslatam.org:443/hotflix/max2/index.m3u8?token=e98c96391ef1fe59b131c720ef5cf25d2a6fced8-23-1777969619-1777915619&ip=79.112.68.91","k1":null,"k2":null},{"url":"https://ng0pr.envivoslatam.org:443/hotflix/fanatiz4/index.m3u8?token=8c3fa64ef29f8bdf32887b1f330b8e489ccedf93-50-1777969620-1777915620&ip=79.112.68.91","k1":null,"k2":null},{"url":"https://wf6kt.envivoslatam.org:443/hotflix/espnpremium/index.m3u8?token=e4420cd9309a429a71a1d5cbd6aab468a0c6a85e-cf-1777969620-1777915620&ip=79.112.68.91","k1":null,"k2":null}];
+
+var currentHls = null;
+var currentShaka = null;
+
+// Helper: URL a través del proxy
+function proxyUrl(url) {
+    return '/proxy?url=' + encodeURIComponent(url);
+}
+
+function playStream(idx) {
+    var s = STREAMS[idx];
+    if (!s) return;
+    
+    var video = document.getElementById('player-video');
+    var overlay = document.getElementById('player-overlay');
+    var status = document.getElementById('player-status');
+    
+    // Limpiar reproductor anterior
+    closePlayerInternal();
+    
+    overlay.className = 'active';
+    status.textContent = 'Cargando stream...';
+    
+    var url = s.url;
+    
+    if (url.indexOf('.m3u8') !== -1) {
+        // ─── HLS via proxy ───
+        if (Hls.isSupported()) {
+            currentHls = new Hls({
+                maxBufferLength: 30,
+                maxMaxBufferLength: 60,
+                liveSyncDurationCount: 3,
+                xhrSetup: function(xhr, xhrUrl) {
+                    // Si la URL ya pasa por el proxy, no la modificamos
+                    if (xhrUrl.indexOf('/proxy?') !== -1) return;
+                    // Si es una URL absoluta, la enviamos por el proxy
+                    if (xhrUrl.indexOf('http') === 0) {
+                        xhr.open('GET', proxyUrl(xhrUrl), true);
+                    }
+                }
+            });
+            // Cargar el m3u8 a través del proxy (el proxy reescribe las URLs internas)
+            currentHls.loadSource(proxyUrl(url));
+            currentHls.attachMedia(video);
+            currentHls.on(Hls.Events.MANIFEST_PARSED, function() {
+                status.textContent = 'HLS ▶ Reproduciendo';
+                video.play().catch(function(){});
+            });
+            currentHls.on(Hls.Events.ERROR, function(ev, data) {
+                console.error('HLS Error:', data);
+                if (data.fatal) {
+                    status.textContent = 'Error HLS: ' + data.type + ' - ' + data.details;
+                    if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
+                        status.textContent += ' (Reintentando...)';
+                        setTimeout(function() { currentHls && currentHls.startLoad(); }, 3000);
+                    }
+                }
+            });
+        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+            // Safari nativo: usa el proxy para reescribir URLs internas
+            video.src = proxyUrl(url);
+            video.addEventListener('loadedmetadata', function() {
+                status.textContent = 'HLS nativo ▶ Reproduciendo';
+                video.play().catch(function(){});
+            });
+            video.addEventListener('error', function() {
+                status.textContent = 'Error: No se pudo cargar el stream';
+            });
+        }
+    } else if (url.indexOf('.mpd') !== -1) {
+        // ─── DASH via proxy (con clearkey DRM si hay k1/k2) ───
+        shaka.polyfill.installAll();
+        var player = new shaka.Player(video);
+        currentShaka = player;
+        
+        // Base URL original del MPD (para resolver URLs relativas)
+        var mpdBase = url.substring(0, url.lastIndexOf('/') + 1);
+        
+        // Filtro de red: todas las peticiones pasan por el proxy
+        player.getNetworkingEngine().registerRequestFilter(function(type, request) {
+            if (request.uris && request.uris.length > 0) {
+                for (var i = 0; i < request.uris.length; i++) {
+                    var uri = request.uris[i];
+                    // Ya pasa por el proxy
+                    if (uri.indexOf('/proxy?') !== -1) continue;
+                    
+                    if (uri.indexOf('http') === 0) {
+                        // Detectar URLs que Shaka resolvió contra localhost
+                        // (ej: http://localhost:3000/dash/20465730-video=1000000.dash)
+                        try {
+                            var parsed = new URL(uri);
+                            if (parsed.hostname === 'localhost' || parsed.hostname === '127.0.0.1') {
+                                // Reconstruir la URL real usando la base del MPD original
+                                var segment = parsed.pathname;
+                                if (segment.startsWith('/')) segment = segment.substring(1);
+                                // Remover el prefijo /proxy?url=... si se coló
+                                if (segment.startsWith('proxy?url=')) {
+                                    request.uris[i] = '/proxy?url=' + segment.substring(10);
+                                    continue;
+                                }
+                                var realUrl = mpdBase + segment;
+                                request.uris[i] = proxyUrl(realUrl);
+                            } else {
+                                // URL absoluta real (no localhost)
+                                request.uris[i] = proxyUrl(uri);
+                            }
+                        } catch(e) {
+                            request.uris[i] = proxyUrl(uri);
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Listener de errores para debug
+        player.addEventListener('error', function(event) {
+            console.error('Shaka error event:', event.detail);
+        });
+        
+        if (s.k1 && s.k2) {
+            player.configure({
+                drm: {
+                    clearKeys: keyPairToClearKey(s.k1, s.k2),
+                    // Forzar SOLO ClearKey, ignorar Widevine/PlayReady del MPD
+                    servers: {},
+                    advanced: {}
+                },
+                streaming: {
+                    lowLatencyMode: false,
+                    autoLowLatencyMode: false
+                }
+            });
+        }
+        
+        // Cargar el MPD a través del proxy
+        player.load(proxyUrl(url)).then(function() {
+            status.textContent = 'DASH' + (s.k1 ? ' (DRM ClearKey)' : '') + ' ▶ Reproduciendo';
+            video.play().catch(function(){});
+        }).catch(function(err) {
+            console.error('Shaka error:', err);
+            var code = err.code || '';
+            var msg = 'Error DASH: ';
+            if (code === 6002) {
+                msg += 'No se pudo inicializar DRM. Asegúrate de usar localhost o HTTPS.';
+            } else if (code === 1002) {
+                msg += 'Error de red. El stream podría no estar disponible.';
+            } else {
+                msg += err.message || ('Código ' + code);
+            }
+            status.textContent = msg;
+        });
+    } else {
+        // Intentar reproducción directa via proxy
+        video.src = proxyUrl(url);
+        video.play().catch(function(){});
+        status.textContent = 'Reproduciendo directo';
+    }
+}
+
+// Convertir k1(hex keyId) y k2(hex key) al formato que Shaka espera
+function keyPairToClearKey(kid, key) {
+    var obj = {};
+    obj[kid] = key;
+    return obj;
+}
+
+function closePlayer() {
+    closePlayerInternal();
+    document.getElementById('player-overlay').className = '';
+}
+
+function closePlayerInternal() {
+    var video = document.getElementById('player-video');
+    if (currentHls) { currentHls.destroy(); currentHls = null; }
+    if (currentShaka) {
+        currentShaka.destroy().catch(function(){});
+        currentShaka = null;
+    }
+    video.removeAttribute('src');
+    video.load();
+}
+
+// Cerrar con Escape
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closePlayer();
+});
+
+// Cerrar al hacer clic fuera del video
+document.getElementById('player-overlay').addEventListener('click', function(e) {
+    if (e.target === this) closePlayer();
+});
+
+// ─── Menú acordeón ───
+$(function() {
+    var menu_ul = $('.menu > li > ul'),
+        menu_a  = $('.menu > li > a');
+    menu_ul.hide();
+    menu_a.click(function(e) {
+        e.preventDefault();
+        if (!$(this).hasClass('active')) {
+            menu_a.removeClass('active');
+            menu_ul.filter(':visible').slideUp('fast');
+            $(this).addClass('active').next().stop(true,true).slideDown('fast');
+        } else {
+            $(this).removeClass('active');
+            $(this).next().stop(true,true).slideUp('fast');
+        }
+    });
+});
+</script>
+
+</body>
+</html>
