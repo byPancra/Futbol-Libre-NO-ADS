@@ -7,8 +7,19 @@ const fs = require('fs');
 const app = express();
 const PORT = 3000;
 
+let cachedHtml = null;
+
+// ─── Ruta principal (Dinámica o estática) ───
+app.get('/', (req, res, next) => {
+    if (cachedHtml) {
+        res.send(cachedHtml);
+    } else {
+        next(); // Pasa al express.static si no hay caché
+    }
+});
+
 // ─── Servir archivos estáticos ───
-app.use(express.static(path.join(__dirname)));
+app.use(express.static(process.cwd()));
 
 // ─── Proxy para streaming (evita CORS) ───
 app.get('/proxy', async (req, res) => {
@@ -101,29 +112,33 @@ app.options('/proxy', (req, res) => {
 });
 
 // ─── Endpoint para re-ejecutar el scraper ───
-app.get('/scrape', (req, res) => {
+app.get('/scrape', async (req, res) => {
     try {
         console.log('Ejecutando scraper...');
-        execSync('node scraper.js', { cwd: __dirname, timeout: 60000 });
+        const { scrapeMatches } = require('./scraper.js');
+        // Ejecuta el scraper sin escribir en disco (para Vercel)
+        cachedHtml = await scrapeMatches(false); 
         console.log('Scraper completado');
-        res.redirect('/');
+        res.send(cachedHtml);
     } catch (err) {
         res.status(500).send('Error ejecutando scraper: ' + err.message);
     }
 });
 
 // ─── Iniciar servidor ───
-app.listen(PORT, '0.0.0.0', () => {
-    const localIp = getLocalIp();
-    console.log('\n⚽ Fútbol Libre Server\n');
-    console.log(`  Local:   http://localhost:${PORT}`);
-    if (localIp) {
-        console.log(`  Red:     http://${localIp}:${PORT}`);
-        console.log(`  Móvil:   Abre esa URL en tu teléfono (misma WiFi)`);
-    }
-    console.log(`\n  /scrape  → Actualizar agenda`);
-    console.log(`  /proxy   → Proxy de streams\n`);
-});
+if (process.env.NODE_ENV !== 'production' && require.main === module) {
+    app.listen(PORT, '0.0.0.0', () => {
+        const localIp = getLocalIp();
+        console.log('\n⚽ Fútbol Libre Server\n');
+        console.log(`  Local:   http://localhost:${PORT}`);
+        if (localIp) {
+            console.log(`  Red:     http://${localIp}:${PORT}`);
+            console.log(`  Móvil:   Abre esa URL en tu teléfono (misma WiFi)`);
+        }
+        console.log(`\n  /scrape  → Actualizar agenda`);
+        console.log(`  /proxy   → Proxy de streams\n`);
+    });
+}
 
 function getLocalIp() {
     const nets = networkInterfaces();
@@ -134,3 +149,5 @@ function getLocalIp() {
     }
     return null;
 }
+
+module.exports = app;

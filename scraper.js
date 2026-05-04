@@ -76,7 +76,7 @@ function decodeStreamUrl(href) {
 }
 
 // ─── Scraping principal ───
-async function scrapeMatches() {
+async function scrapeMatches(writeToDisk = true) {
     const startTime = Date.now();
     console.log('Scraping agenda de pelotalibretv.su...\n');
 
@@ -170,15 +170,21 @@ async function scrapeMatches() {
         }
         txt += '\n';
     }
-    fs.writeFileSync('partidos.txt', txt, 'utf-8');
 
     // ─── 4. Generar index.html ───
-    fs.writeFileSync('index.html', buildHtml(agendaTitle, matches), 'utf-8');
+    const htmlOutput = buildHtml(agendaTitle, matches);
+
+    if (writeToDisk) {
+        fs.writeFileSync('partidos.txt', txt, 'utf-8');
+        fs.writeFileSync('index.html', htmlOutput, 'utf-8');
+        console.log(`✅ partidos.txt generado`);
+        console.log(`✅ index.html generado`);
+    }
 
     const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
-    console.log(`✅ partidos.txt generado`);
-    console.log(`✅ index.html generado`);
     console.log(`⏱  Tiempo total: ${elapsed}s`);
+    
+    return htmlOutput;
 }
 
 // ─── Generar el HTML con reproductor integrado ───
@@ -513,4 +519,8 @@ function sleep(ms) {
     return new Promise(r => setTimeout(r, ms));
 }
 
-scrapeMatches().catch(err => console.error('Error fatal:', err));
+if (require.main === module) {
+    scrapeMatches(true).catch(err => console.error('Error fatal:', err));
+}
+
+module.exports = { scrapeMatches };

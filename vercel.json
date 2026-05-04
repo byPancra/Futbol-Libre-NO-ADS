@@ -1,0 +1,8 @@
+{
+  "version": 2,
+  "rewrites": [
+    { "source": "/proxy", "destination": "/api/index.js" },
+    { "source": "/scrape", "destination": "/api/index.js" },
+    { "source": "/", "destination": "/api/index.js" }
+  ]
+}
