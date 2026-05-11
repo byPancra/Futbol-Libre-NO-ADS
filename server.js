@@ -32,7 +32,7 @@ app.get('/download', async (req, res) => {
         }
 
         res.set('Content-Type', 'text/html; charset=utf-8');
-        res.set('Content-Disposition', 'attachment; filename="futbol-libre.html"');
+        res.set('Content-Disposition', 'attachment; filename="futbol libre sin publicidad.html"');
         res.send(html);
     } catch (err) {
         console.error('Error generando descarga:', err.message);

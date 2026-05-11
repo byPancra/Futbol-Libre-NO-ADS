@@ -380,6 +380,19 @@ function buildHtml(title, matches) {
         </li>`;
     }
 
+    if (matches.length === 0) {
+        matchesHtml = `
+        <div class="no-matches-msg" style="text-align: center; padding: 3rem 1rem; color: var(--text-secondary); background: rgba(255,255,255,0.02); border-radius: 1rem; border: 1px solid var(--card-border); margin-top: 1rem;">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 1rem; opacity: 0.5;">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <h3 style="font-size: 1.2rem; color: var(--text-primary); margin-bottom: 0.5rem;">Aún no hay partidos agendados</h3>
+            <p>Por favor, inténtalo de nuevo más tarde cuando la agenda se haya actualizado.</p>
+        </div>`;
+    }
+
     let countryFiltersHtml = '<div class="filter-item active" data-filter="all">Todos los Países</div>';
     for (const c of sortedCountries) {
         const cleanC = c.split(' ').filter(x => x !== 'menu-item').join(' ');
