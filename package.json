@@ -9,6 +9,8 @@
   },
   "dependencies": {
     "cheerio": "^1.2.0",
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "node-fetch": "^2.7.0",
+    "socks-proxy-agent": "^10.0.0"
   }
 }

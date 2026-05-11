@@ -1,8 +1,8 @@
 const express = require('express');
-const { execSync } = require('child_process');
+const { Readable } = require('stream');
 const { networkInterfaces } = require('os');
 const path = require('path');
-const fs = require('fs');
+const { scrapeMatches } = require('./scraper.js');
 
 const app = express();
 const PORT = 3000;
@@ -11,23 +11,32 @@ let cachedHtml = null;
 let lastScrapeTime = 0;
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutos
 
-// ─── Ruta principal (Dinámica o estática) ───
-app.get('/', async (req, res, next) => {
-    const now = Date.now();
-    if (cachedHtml && (now - lastScrapeTime < CACHE_TTL)) {
-        return res.send(cachedHtml);
-    } else {
-        try {
-            console.log('Cache expirado o vacío. Ejecutando scraper dinámico...');
-            const { scrapeMatches } = require('./scraper.js');
-            cachedHtml = await scrapeMatches(false); 
+// ─── Ruta principal: Landing Page ───
+app.get('/', (req, res) => {
+    res.sendFile(path.join(process.cwd(), 'landing.html'));
+});
+
+// ─── Endpoint de descarga: genera y devuelve index.html standalone ───
+app.get('/download', async (req, res) => {
+    try {
+        const now = Date.now();
+        let html;
+
+        if (cachedHtml && (now - lastScrapeTime < CACHE_TTL)) {
+            html = cachedHtml;
+        } else {
+            console.log('Generando agenda para descarga...');
+            html = await scrapeMatches(false);
+            cachedHtml = html;
             lastScrapeTime = Date.now();
-            res.send(cachedHtml);
-        } catch(err) {
-            console.error('Error en scraper dinámico:', err.message);
-            if (cachedHtml) return res.send(cachedHtml);
-            next(); // fallback al archivo estático
         }
+
+        res.set('Content-Type', 'text/html; charset=utf-8');
+        res.set('Content-Disposition', 'attachment; filename="futbol-libre.html"');
+        res.send(html);
+    } catch (err) {
+        console.error('Error generando descarga:', err.message);
+        res.status(500).send('Error generando la agenda: ' + err.message);
     }
 });
 
@@ -85,6 +94,15 @@ app.get('/proxy', async (req, res) => {
                 return '/proxy?url=' + encodeURIComponent(match);
             });
 
+            // Reescribir también URIs de encryption keys (#EXT-X-KEY:...URI="...")
+            body = body.replace(/(#EXT-X-KEY:[^\n]*URI=")((?!\/?proxy\?)[^"]+)(")/gm, (match, prefix, uri, suffix) => {
+                if (uri.startsWith('/proxy?') || uri.startsWith('data:')) return match;
+                const absolute = uri.startsWith('http') ? uri
+                    : uri.startsWith('/') ? new URL(uri, new URL(url).origin).href
+                    : baseUrl + uri;
+                return prefix + '/proxy?url=' + encodeURIComponent(absolute) + suffix;
+            });
+
             res.set('Content-Type', 'application/vnd.apple.mpegurl');
             res.set('Access-Control-Allow-Origin', '*');
             return res.send(body);
@@ -106,11 +124,14 @@ app.get('/proxy', async (req, res) => {
         }
 
         // Para segmentos binarios y otros archivos
-        const buffer = Buffer.from(await upstream.arrayBuffer());
-        if (contentType) res.set('Content-Type', contentType);
         res.set('Access-Control-Allow-Origin', '*');
         res.set('Access-Control-Allow-Headers', '*');
-        res.send(buffer);
+        if (contentType) res.set('Content-Type', contentType);
+        
+        // Optimización: Usar stream piping
+        const nodeStream = Readable.fromWeb(upstream.body);
+        nodeStream.pipe(res);
+        nodeStream.on('error', () => res.end());
 
     } catch (err) {
         console.error('Proxy error:', err.message);
@@ -128,11 +149,23 @@ app.options('/proxy', (req, res) => {
     res.sendStatus(204);
 });
 
-// ─── Endpoint para re-ejecutar el scraper ───
+// ─── Endpoint para resolver stream lazy ───
+app.get('/resolve', async (req, res) => {
+    const url = req.query.url;
+    if (!url) return res.json(null);
+    try {
+        const { getStreamUrl } = require('./scraper.js');
+        const result = await getStreamUrl(url);
+        res.json(result || null);
+    } catch {
+        res.json(null);
+    }
+});
+
+// ─── Endpoint para re-ejecutar el scraper (legacy) ───
 app.get('/scrape', async (req, res) => {
     try {
         console.log('Actualización manual forzada...');
-        const { scrapeMatches } = require('./scraper.js');
         cachedHtml = await scrapeMatches(false); 
         lastScrapeTime = Date.now();
         res.send(cachedHtml);
@@ -151,8 +184,9 @@ if (process.env.NODE_ENV !== 'production' && require.main === module) {
             console.log(`  Red:     http://${localIp}:${PORT}`);
             console.log(`  Móvil:   Abre esa URL en tu teléfono (misma WiFi)`);
         }
-        console.log(`\n  /scrape  → Actualizar agenda`);
-        console.log(`  /proxy   → Proxy de streams\n`);
+        console.log(`\n  /           → Landing page`);
+        console.log(`  /download   → Descargar agenda HTML`);
+        console.log(`  /proxy      → Proxy de streams\n`);
     });
 }
 

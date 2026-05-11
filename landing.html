@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Futbol Libre - Descarga</title>
+    <meta name="description" content="Descarga Futbol Libre y disfruta de todos los partidos en vivo gratis desde tu navegador.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0a0e1a;
+            --card-bg: rgba(20, 27, 45, 0.6);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --text-primary: #f0f4ff;
+            --text-secondary: #8892b0;
+            --accent: #84cc16;
+            --accent-glow: rgba(132, 204, 22, 0.4);
+            --blue: #3b82f6;
+            --blue-glow: rgba(59, 130, 246, 0.3);
+            --warp-orange: #f6821f;
+            --glass-blur: blur(16px);
+            --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* === Animated Background === */
+        .bg-gradient {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+            background:
+                radial-gradient(ellipse 80% 60% at 10% 20%, rgba(132, 204, 22, 0.12) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 50% at 90% 10%, rgba(59, 130, 246, 0.10) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 40% at 50% 80%, rgba(132, 204, 22, 0.06) 0%, transparent 60%);
+            animation: bgShift 12s ease-in-out infinite alternate;
+        }
+
+        @keyframes bgShift {
+            0% { transform: scale(1) translate(0, 0); }
+            50% { transform: scale(1.05) translate(-1%, 2%); }
+            100% { transform: scale(1) translate(1%, -1%); }
+        }
+
+        /* === Particles === */
+        .particles {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: var(--accent);
+            border-radius: 50%;
+            opacity: 0;
+            animation: particleFloat 8s infinite;
+        }
+
+        @keyframes particleFloat {
+            0% { opacity: 0; transform: translateY(100vh) scale(0); }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.2; }
+            100% { opacity: 0; transform: translateY(-10vh) scale(1.5); }
+        }
+
+        /* === Main Container === */
+        .landing-container {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+        }
+
+        /* === Header / Nav === */
+        .landing-nav {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            margin-bottom: 2rem;
+        }
+
+        .nav-logo {
+            font-size: 1.6rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .nav-logo .logo-text {
+            background: linear-gradient(135deg, var(--accent), var(--blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-logo .logo-sub {
+            font-weight: 400;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            -webkit-text-fill-color: var(--text-secondary);
+        }
+
+        .nav-badge {
+            background: rgba(132, 204, 22, 0.1);
+            color: var(--accent);
+            padding: 0.4rem 1rem;
+            border-radius: 99px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border: 1px solid rgba(132, 204, 22, 0.2);
+            letter-spacing: 0.05em;
+        }
+
+        /* === Hero Section === */
+        .hero {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            max-width: 800px;
+            gap: 2.5rem;
+            padding: 2rem 0 4rem;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(132, 204, 22, 0.08);
+            border: 1px solid rgba(132, 204, 22, 0.15);
+            padding: 0.5rem 1.2rem;
+            border-radius: 99px;
+            font-size: 0.85rem;
+            color: var(--accent);
+            font-weight: 500;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        .hero-badge .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.5); }
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 800;
+            line-height: 1.1;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .hero h1 .gradient-text {
+            background: linear-gradient(135deg, var(--accent) 0%, #a3e635 40%, var(--blue) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 200% 200%;
+            animation: gradientShift 4s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            line-height: 1.7;
+            font-weight: 300;
+            animation: fadeInUp 0.8s ease 0.1s both;
+        }
+
+        /* === Download Button === */
+        .download-wrapper {
+            animation: fadeInUp 0.8s ease 0.2s both;
+        }
+
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 1.1rem 2.8rem;
+            background: linear-gradient(135deg, var(--accent), #65a30d);
+            color: #0a0e1a;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 99px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 30px var(--accent-glow), 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .download-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .download-btn:hover::before {
+            left: 100%;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 0 50px var(--accent-glow), 0 12px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .download-btn:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        .download-btn svg {
+            width: 22px;
+            height: 22px;
+            animation: bounceDown 2s infinite;
+        }
+
+        @keyframes bounceDown {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(3px); }
+        }
+
+        .download-info {
+            margin-top: 0.8rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.3rem;
+        }
+
+        .download-info .file-size {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* === Features Grid === */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.2rem;
+            width: 100%;
+            max-width: 800px;
+            animation: fadeInUp 0.8s ease 0.3s both;
+        }
+
+        .feature-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 1.2rem;
+            padding: 1.5rem;
+            text-align: center;
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            transition: var(--transition);
+        }
+
+        .feature-card:hover {
+            border-color: rgba(132, 204, 22, 0.25);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .feature-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .feature-desc {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* === WARP Notice === */
+        .warp-notice {
+            width: 100%;
+            max-width: 800px;
+            margin-top: 3rem;
+            animation: fadeInUp 0.8s ease 0.4s both;
+        }
+
+        .warp-card {
+            background: linear-gradient(135deg, rgba(246, 130, 31, 0.06), rgba(59, 130, 246, 0.06));
+            border: 1px solid rgba(246, 130, 31, 0.15);
+            border-radius: 1.5rem;
+            padding: 2rem 2.5rem;
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            transition: var(--transition);
+        }
+
+        .warp-card:hover {
+            border-color: rgba(246, 130, 31, 0.3);
+            box-shadow: 0 8px 30px rgba(246, 130, 31, 0.08);
+        }
+
+        .warp-icon {
+            flex-shrink: 0;
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, var(--warp-orange), #f59e0b);
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            box-shadow: 0 4px 20px rgba(246, 130, 31, 0.3);
+        }
+
+        .warp-content {
+            flex: 1;
+        }
+
+        .warp-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .warp-title .rec-badge {
+            background: rgba(246, 130, 31, 0.15);
+            color: var(--warp-orange);
+            padding: 0.2rem 0.6rem;
+            border-radius: 99px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .warp-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .warp-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--warp-orange);
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: var(--transition);
+            padding: 0.5rem 1.2rem;
+            border-radius: 99px;
+            background: rgba(246, 130, 31, 0.1);
+            border: 1px solid rgba(246, 130, 31, 0.2);
+        }
+
+        .warp-link:hover {
+            background: rgba(246, 130, 31, 0.2);
+            transform: translateX(4px);
+        }
+
+        .warp-link svg {
+            width: 16px;
+            height: 16px;
+            transition: transform 0.3s ease;
+        }
+
+        .warp-link:hover svg {
+            transform: translateX(3px);
+        }
+
+        /* === How It Works === */
+        .how-it-works {
+            width: 100%;
+            max-width: 800px;
+            margin-top: 3rem;
+            animation: fadeInUp 0.8s ease 0.5s both;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .steps {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .step {
+            flex: 1;
+            text-align: center;
+            padding: 1.5rem 1rem;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 1.2rem;
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            transition: var(--transition);
+        }
+
+        .step:hover {
+            border-color: rgba(132, 204, 22, 0.2);
+            transform: translateY(-3px);
+        }
+
+        .step-number {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--accent), var(--blue));
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--bg-color);
+            margin-bottom: 0.8rem;
+        }
+
+        .step-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .step-desc {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* === Footer === */
+        .landing-footer {
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+            padding: 3rem 0 2rem;
+            margin-top: 2rem;
+            border-top: 1px solid var(--card-border);
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        /* === Loading State === */
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(10, 14, 26, 0.9);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 1.5rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(132, 204, 22, 0.2);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .loading-sub {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* === Animations === */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* === Responsive === */
+        @media (max-width: 768px) {
+            .features {
+                grid-template-columns: 1fr;
+            }
+
+            .warp-card {
+                flex-direction: column;
+                text-align: center;
+                padding: 1.5rem;
+                gap: 1.2rem;
+            }
+
+            .steps {
+                flex-direction: column;
+            }
+
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+
+            .landing-nav {
+                flex-direction: column;
+                gap: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Animated background -->
+<div class="bg-gradient"></div>
+
+<!-- Floating particles -->
+<div class="particles" id="particles"></div>
+
+<!-- Loading overlay -->
+<div class="loading-overlay" id="loading-overlay">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Generando agenda actualizada...</div>
+    <div class="loading-sub">Esto puede tardar unos segundos</div>
+</div>
+
+<div class="landing-container">
+
+    <!-- Nav -->
+    <nav class="landing-nav">
+        <div class="nav-logo">
+            <span>⚽</span>
+            <span class="logo-text">FUTBOL LIBRE</span>
+            <span class="logo-sub">Premium</span>
+        </div>
+        <div class="nav-badge">v3.0 — Sin servidor</div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero" id="hero">
+        <div class="hero-badge">
+            <span class="pulse-dot"></span>
+            Agenda deportiva actualizada en vivo
+        </div>
+
+        <h1>
+            Todos los partidos<br>
+            <span class="gradient-text">en un solo archivo</span>
+        </h1>
+
+        <p class="hero-subtitle">
+            Descarga el archivo HTML con la agenda completa del día. 
+            Ábrelo en cualquier navegador y disfruta de todos los partidos sin depender de ningún servidor.
+        </p>
+
+        <!-- Download CTA -->
+        <div class="download-wrapper">
+            <button class="download-btn" id="download-btn" onclick="downloadIndex()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Descargar Agenda
+            </button>
+            <div class="download-info">
+                Archivo HTML autocontenido — se abre en cualquier navegador
+            </div>
+        </div>
+
+        <!-- Feature cards -->
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">🌐</div>
+                <div class="feature-title">100% Navegador</div>
+                <div class="feature-desc">No necesitas instalar nada. Solo abre el archivo.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔒</div>
+                <div class="feature-title">Sin Servidor</div>
+                <div class="feature-desc">Todo funciona en tu dispositivo. Mayor privacidad.</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <div class="feature-title">Siempre Fresco</div>
+                <div class="feature-desc">Cada descarga genera la agenda actualizada al momento.</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- WARP Notice -->
+    <div class="warp-notice">
+        <div class="warp-card">
+            <div class="warp-icon">🛡️</div>
+            <div class="warp-content">
+                <div class="warp-title">
+                    Usa Cloudflare WARP
+                    <span class="rec-badge">Recomendado</span>
+                </div>
+                <p class="warp-desc">
+                    Para un mejor funcionamiento de los streams y proteger tu privacidad al navegar, 
+                    te recomendamos instalar <strong>Cloudflare WARP</strong> (1.1.1.1). Es gratuito, ligero 
+                    y mejora la velocidad de conexión además de cifrar tu tráfico DNS.
+                </p>
+                <a href="https://one.one.one.one/" target="_blank" rel="noopener noreferrer" class="warp-link">
+                    Descargar WARP gratis
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12"/>
+                        <polyline points="12 5 19 12 12 19"/>
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- How It Works -->
+    <div class="how-it-works">
+        <h2 class="section-title">¿Cómo funciona?</h2>
+        <div class="steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-title">Descarga</div>
+                <div class="step-desc">Haz clic en el botón y espera unos segundos mientras se genera la agenda.</div>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-title">Abre</div>
+                <div class="step-desc">Abre el archivo index.html descargado en tu navegador favorito.</div>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-title">Disfruta</div>
+                <div class="step-desc">Elige tu partido, selecciona un canal y listo. ¡A disfrutar!</div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="landing-footer">
+        Futbol Libre © 2026 — Proyecto de código abierto. No alojamos contenido.
+    </footer>
+
+</div>
+
+<script>
+    // Generate particles
+    (function() {
+        var container = document.getElementById('particles');
+        for (var i = 0; i < 30; i++) {
+            var p = document.createElement('div');
+            p.className = 'particle';
+            p.style.left = Math.random() * 100 + '%';
+            p.style.animationDelay = Math.random() * 8 + 's';
+            p.style.animationDuration = (6 + Math.random() * 6) + 's';
+            p.style.width = p.style.height = (2 + Math.random() * 3) + 'px';
+            if (Math.random() > 0.5) p.style.background = '#3b82f6';
+            container.appendChild(p);
+        }
+    })();
+
+    function downloadIndex() {
+        var btn = document.getElementById('download-btn');
+        var overlay = document.getElementById('loading-overlay');
+        
+        btn.disabled = true;
+        btn.style.opacity = '0.6';
+        btn.style.pointerEvents = 'none';
+        overlay.classList.add('active');
+
+        fetch('/download')
+            .then(function(res) {
+                if (!res.ok) throw new Error('Error generando la agenda');
+                return res.blob();
+            })
+            .then(function(blob) {
+                var url = URL.createObjectURL(blob);
+                var a = document.createElement('a');
+                a.href = url;
+                a.download = 'futbol-libre.html';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                overlay.classList.remove('active');
+                btn.disabled = false;
+                btn.style.opacity = '1';
+                btn.style.pointerEvents = 'auto';
+            })
+            .catch(function(err) {
+                overlay.classList.remove('active');
+                btn.disabled = false;
+                btn.style.opacity = '1';
+                btn.style.pointerEvents = 'auto';
+                alert('Error: ' + err.message + '\n\nIntenta de nuevo en unos segundos.');
+            });
+    }
+</script>
+
+</body>
+</html>
