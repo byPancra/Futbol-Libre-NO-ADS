@@ -5,6 +5,7 @@ const path = require('path');
 const { scrapeMatches } = require('./scraper.js');
 
 const app = express();
+app.set('trust proxy', 1);
 const PORT = 3000;
 
 let cachedHtml = null;
@@ -31,9 +32,13 @@ app.get('/download', async (req, res) => {
             lastScrapeTime = Date.now();
         }
 
+        const serverOrigin = `${req.protocol}://${req.get('host')}`;
+        // Inyectamos la URL base del servidor en el HTML descargado
+        let finalHtml = html.replace('<head>', `<head>\n    <script>window.PROXY_HOST = "${serverOrigin}";</script>`);
+
         res.set('Content-Type', 'text/html; charset=utf-8');
         res.set('Content-Disposition', 'attachment; filename="futbol libre sin publicidad.html"');
-        res.send(html);
+        res.send(finalHtml);
     } catch (err) {
         console.error('Error generando descarga:', err.message);
         res.status(500).send('Error generando la agenda: ' + err.message);
@@ -71,13 +76,14 @@ app.get('/proxy', async (req, res) => {
         if (url.endsWith('.m3u8') || contentType.includes('mpegurl') || contentType.includes('x-mpegURL')) {
             let body = await upstream.text();
             const baseUrl = url.substring(0, url.lastIndexOf('/') + 1);
+            const proxyBase = `${req.protocol}://${req.get('host')}/proxy?url=`;
 
             // Reescribir URLs relativas a absolutas via proxy
             body = body.replace(/^(?!#)(?!https?:\/\/)(.+\.ts.*)$/gm, (match) => {
                 const absolute = match.startsWith('/') 
                     ? new URL(match, new URL(url).origin).href 
                     : baseUrl + match;
-                return '/proxy?url=' + encodeURIComponent(absolute);
+                return proxyBase + encodeURIComponent(absolute);
             });
 
             // Reescribir también playlists de variante (líneas que no empiezan con #)
@@ -85,22 +91,22 @@ app.get('/proxy', async (req, res) => {
                 const absolute = match.startsWith('/')
                     ? new URL(match, new URL(url).origin).href
                     : baseUrl + match;
-                return '/proxy?url=' + encodeURIComponent(absolute);
+                return proxyBase + encodeURIComponent(absolute);
             });
 
             // Reescribir URLs absolutas (que NO pasan por proxy aún)
             body = body.replace(/^(https?:\/\/.+)$/gm, (match) => {
                 if (match.includes('/proxy?')) return match; // ya proxied
-                return '/proxy?url=' + encodeURIComponent(match);
+                return proxyBase + encodeURIComponent(match);
             });
 
             // Reescribir también URIs de encryption keys (#EXT-X-KEY:...URI="...")
             body = body.replace(/(#EXT-X-KEY:[^\n]*URI=")((?!\/?proxy\?)[^"]+)(")/gm, (match, prefix, uri, suffix) => {
-                if (uri.startsWith('/proxy?') || uri.startsWith('data:')) return match;
+                if (uri.includes('/proxy?') || uri.startsWith('data:')) return match;
                 const absolute = uri.startsWith('http') ? uri
                     : uri.startsWith('/') ? new URL(uri, new URL(url).origin).href
                     : baseUrl + uri;
-                return prefix + '/proxy?url=' + encodeURIComponent(absolute) + suffix;
+                return prefix + proxyBase + encodeURIComponent(absolute) + suffix;
             });
 
             res.set('Content-Type', 'application/vnd.apple.mpegurl');
@@ -112,10 +118,11 @@ app.get('/proxy', async (req, res) => {
         // (Shaka usa el request filter para proxear las peticiones de segmentos)
         if (url.endsWith('.mpd') || contentType.includes('dash+xml')) {
             let body = await upstream.text();
+            const proxyBase = `${req.protocol}://${req.get('host')}/proxy?url=`;
 
             // Solo reescribir UTCTiming URLs si las hay (evita CORS en timing)
             body = body.replace(/value="(https?:\/\/[^"]+)"/gi, (match, timingUrl) => {
-                return 'value="/proxy?url=' + encodeURIComponent(timingUrl) + '"';
+                return 'value="' + proxyBase + encodeURIComponent(timingUrl) + '"';
             });
 
             res.set('Content-Type', 'application/dash+xml');

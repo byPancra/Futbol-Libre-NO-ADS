@@ -1044,10 +1044,13 @@ function buildHtml(title, matches) {
         var url = s.url;
         if (!url) { status.textContent = 'URL no disponible'; return; }
         
+        var proxyBase = window.PROXY_HOST ? (window.PROXY_HOST + '/proxy?url=') : (window.location.protocol === 'file:' ? 'http://localhost:3000/proxy?url=' : '/proxy?url=');
+        var proxiedUrl = proxyBase + encodeURIComponent(url);
+        
         if (url.indexOf('.m3u8') !== -1) {
             if (Hls.isSupported()) {
                 currentHls = new Hls({ maxBufferLength: 30 });
-                currentHls.loadSource(url);
+                currentHls.loadSource(proxiedUrl);
                 currentHls.attachMedia(video);
                 currentHls.on(Hls.Events.MANIFEST_PARSED, function() {
                     status.textContent = 'HLS ▶ Reproduciendo';
@@ -1057,7 +1060,7 @@ function buildHtml(title, matches) {
                     if (data.fatal) status.textContent = 'Error HLS: ' + data.type;
                 });
             } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                video.src = url;
+                video.src = proxiedUrl;
                 video.play().catch(function(){});
                 status.textContent = 'HLS nativo ▶ Reproduciendo';
             }
@@ -1066,12 +1069,19 @@ function buildHtml(title, matches) {
             var player = new shaka.Player(video);
             currentShaka = player;
 
+            // Filtro para proxear segmentos en DASH
+            player.getNetworkingEngine().registerRequestFilter(function(type, request) {
+                if (request.uris[0] && request.uris[0].indexOf('/proxy?') === -1 && !request.uris[0].startsWith('data:')) {
+                    request.uris[0] = proxyBase + encodeURIComponent(request.uris[0]);
+                }
+            });
+
             if (s.k1 && s.k2) {
                 var keys = {}; keys[s.k1] = s.k2;
                 player.configure({ drm: { clearKeys: keys } });
             }
             
-            player.load(url).then(function() {
+            player.load(proxiedUrl).then(function() {
                 status.textContent = 'DASH' + (s.k1 ? ' (DRM)' : '') + ' ▶ Reproduciendo';
                 video.play().catch(function(){});
             }).catch(function(err) {
