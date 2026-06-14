@@ -10,7 +10,7 @@ const CONCURRENCY = 15; // Aumentado para procesar más rápido
 // Devuelve { url, k1?, k2? } o null
 async function getStreamUrl(targetUrl, refererOrigin) {
     try {
-        const referer = refererOrigin || 'https://pelotalibretv.su/';
+        const referer = refererOrigin || 'https://librepelota.su/';
         const response = await fetch(targetUrl, {
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -120,8 +120,8 @@ function decodeStreamUrl(href) {
 
 // ─── Fuentes de scraping ───
 const SOURCES = [
-    { url: 'https://futbol-libre.su/agenda/', origin: 'https://futbol-libre.su' },
-    { url: 'https://pelotalibretv.su/agenda/', origin: 'https://pelotalibretv.su' }
+    { url: 'https://futbol-libres.su/agenda/', origin: 'https://futbol-libres.su/' },
+    { url: 'https://librepelota.su/agenda/', origin: 'https://librepelota.su/' }
 ];
 
 // ─── Parsear partidos de un HTML de agenda ───
@@ -255,7 +255,7 @@ async function scrapeMatches(writeToDisk = true) {
                 optionsToResolve.push({
                     opt, decoded,
                     matchName: match.matchName,
-                    referer: (opt.sourceOrigin || 'https://pelotalibretv.su') + '/'
+                    referer: (opt.sourceOrigin || 'https://librepelota.su') + '/'
                 });
             }
         }
@@ -356,7 +356,7 @@ function buildHtml(title, matches) {
         }
 
         const matchLeague = match.matchName.includes(':') ? match.matchName.split(':')[0].trim() : '';
-        const logoUrl = match.leagueLogo ? (match.leagueLogo.startsWith('http') ? match.leagueLogo : 'https://pelotalibretv.su' + match.leagueLogo) : '';
+        const logoUrl = match.leagueLogo ? (match.leagueLogo.startsWith('http') ? match.leagueLogo : 'https://librepelota.su' + match.leagueLogo) : '';
         
         // Normalizar clases de país para CSS (ej: "menu-item ES" -> "ES")
         const cleanCountryClass = match.countryClass.split(' ').filter(c => c !== 'menu-item').join(' ');
@@ -753,7 +753,7 @@ function buildHtml(title, matches) {
             width: 24px;
             height: 24px;
             display: inline-block;
-            background-image: url(https://pelotalibretv.su/agenda/spriteupdate8.png);
+            background-image: url(https://librepelota.su/agenda/spriteupdate8.png);
             background-repeat: no-repeat;
             background-size: 100px 800px; /* Ajuste para el sprite original */
             filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
