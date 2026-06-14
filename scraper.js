@@ -255,7 +255,7 @@ async function scrapeMatches(writeToDisk = true) {
                 optionsToResolve.push({
                     opt, decoded,
                     matchName: match.matchName,
-                    referer: (opt.sourceOrigin || 'https://librepelota.su') + '/'
+                    referer: (opt.sourceOrigin || 'https://librepelota.su/') + '/'
                 });
             }
         }
@@ -356,7 +356,7 @@ function buildHtml(title, matches) {
         }
 
         const matchLeague = match.matchName.includes(':') ? match.matchName.split(':')[0].trim() : '';
-        const logoUrl = match.leagueLogo ? (match.leagueLogo.startsWith('http') ? match.leagueLogo : 'https://librepelota.su' + match.leagueLogo) : '';
+        const logoUrl = match.leagueLogo ? (match.leagueLogo.startsWith('http') ? match.leagueLogo : 'https://librepelota.su/' + match.leagueLogo) : '';
         
         // Normalizar clases de país para CSS (ej: "menu-item ES" -> "ES")
         const cleanCountryClass = match.countryClass.split(' ').filter(c => c !== 'menu-item').join(' ');
